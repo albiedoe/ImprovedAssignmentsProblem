@@ -48,8 +48,9 @@ public class Driver {
 				if (jobsChosen == numPeople) {
 					compareCombos();
 				}
-				else{//Compare partial solution with optimal future picks with currentBest
-					
+				else if(canPrune()){//Compare partial solution with optimal future picks with currentBest
+					partial++;
+					skipCurrentJob();
 				}
 			} else {
 				backUpLevel();
@@ -62,10 +63,53 @@ public class Driver {
 			System.out.println("Person " + i + " assigned job " + bestCombo[i]);
 		}
 		System.out.println("Number of Job Assignments Explored: " + cost);
+		System.out.println("Number of Partial Job Assignments Explored: " + partial);
+		int sum = partial+cost;
+		System.out.println("Number of Total Job Assignments Explored: " + sum);		
 		System.out.println("Best Job Assignment cost: " + total);
 
 	}
 
+	/*
+	 * This method skips the currently last assigned job because it cannot lead 
+	 * to a feasible solution.
+	 */
+	public static void skipCurrentJob() {
+		do {
+			currentCombo[jobsChosen - 1]++;
+		} while (!checkRows() && currentCombo[jobsChosen - 1] < numPeople);
+		
+	}
+	
+	
+	
+	/*
+	 * This method compares the currentCombination of assignments with the best
+	 * possible future picks to see if it can be greater than the current best Total.
+	 * If true, then partial gets incremented and we back up because it can't lead 
+	 * to a feasible solution
+	 * 
+	 * @return boolean stating whether we can prune this branch or not
+	 */
+	public static boolean canPrune() {
+		boolean result = false;
+		int projectedTotal = 0;
+		
+		int i = 0;
+		while(i<jobsChosen){
+			projectedTotal += board[i][currentCombo[i]];
+			i++;
+		}
+		while(i<numPeople){
+			projectedTotal += bestPossibleCombination[i];
+			i++;
+		}
+		if(projectedTotal<bestTotal){//Cant be greater than current Best Total
+			result = true;
+		}
+		return result;
+	}
+	
 	/*
 	 * This method simply compares the current productivity combo to the
 	 * previous best
@@ -74,19 +118,14 @@ public class Driver {
 		int currentTotal = 0;
 		int pastTotal = 0;
 
-		/*if (bestCombo == null) {
-			bestCombo = new int[numPeople];
-			for (int i = 0; i < numPeople; i++) {
-				bestCombo[i] = currentCombo[i];
-			}
-		}*/
 		cost++;
 		for (int i = 0; i < numPeople; i++) {
 			currentTotal += board[i][currentCombo[i]];
 			pastTotal += board[i][bestCombo[i]];
 		}
-
+		
 		if (currentTotal >= pastTotal) {
+			bestTotal = 0;
 			for (int i = 0; i < numPeople; i++) {
 				bestCombo[i] = currentCombo[i];
 				bestTotal += board[i][currentCombo[i]];
@@ -227,7 +266,7 @@ public class Driver {
 			}
 
 		}
-		int ax = 3;
+	
 
 
 	}
