@@ -1,9 +1,11 @@
 /*
  * Purpose: Design and Analysis of Algorithms Assignment 2
  * Status: Complete and thoroughly tested
- * Last update: 01/20/15
- * Submitted:  03/06/15
- * Comment: 
+ * Last update: 03/25/15
+ * Submitted:  03/30/15
+ * Comment: Same as Assignment 2. Only Difference is need to check at each assignment
+ * if we can prune. We prune by taking best possible combo of next rows and adding them to the total
+ * to see if it can be higher than the previous max.
  * @author: Albert Rynkiewicz
  * @version: 2015.03.25
  */
@@ -23,8 +25,11 @@ public class Driver {
 	static int currentCombo[];
 	static int jobsChosen = 0;
 	static int bestCombo[];
+	static int bestTotal = 0;
+	static int bestPossibleCombination[];
 	static boolean done = false;
 	static int cost = 0;
+	static int partial = 0; 
 
 	public static void main(String[] args) {
 
@@ -42,6 +47,9 @@ public class Driver {
 				// total productivity is greater than the current max
 				if (jobsChosen == numPeople) {
 					compareCombos();
+				}
+				else{//Compare partial solution with optimal future picks with currentBest
+					
 				}
 			} else {
 				backUpLevel();
@@ -66,12 +74,12 @@ public class Driver {
 		int currentTotal = 0;
 		int pastTotal = 0;
 
-		if (bestCombo == null) {
+		/*if (bestCombo == null) {
 			bestCombo = new int[numPeople];
 			for (int i = 0; i < numPeople; i++) {
 				bestCombo[i] = currentCombo[i];
 			}
-		}
+		}*/
 		cost++;
 		for (int i = 0; i < numPeople; i++) {
 			currentTotal += board[i][currentCombo[i]];
@@ -81,6 +89,7 @@ public class Driver {
 		if (currentTotal >= pastTotal) {
 			for (int i = 0; i < numPeople; i++) {
 				bestCombo[i] = currentCombo[i];
+				bestTotal += board[i][currentCombo[i]];
 			}
 		}
 
@@ -188,7 +197,9 @@ public class Driver {
 		System.out.println(args[0]);
 		numPeople = Integer.parseInt(args[0]);
 		board = new int[numPeople][numPeople];
-
+		bestCombo = new int[numPeople];
+		bestPossibleCombination = new int[numPeople];
+		
 		int i = 0;
 		int j = 0;
 
@@ -206,10 +217,18 @@ public class Driver {
 
 			// Column Counter
 			for (j = 0; j < numPeople; j++) {
-				board[i][j] = argsNums[numPeople * i + j];
+				int num = argsNums[numPeople * i + j];
+				//Initializes board
+				board[i][j] = num;
+				//initializes bestPossibleCombination
+				if(bestPossibleCombination[i]<num){
+					bestPossibleCombination[i]=num;
+				}
 			}
 
 		}
+		int ax = 3;
+
 
 	}
 
